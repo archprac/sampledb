@@ -1,0 +1,15 @@
+id,contract_type_cd,staff_first_name,staff_last_name,gender_cd,staff_address,staff_email_address,staff_phone_number
+1000,1,John,Smith,1,10-18 Geryon Montes,john.s@example.com,XXX-741-9881
+1001,2,William,Garcia,1,56-12 Hypsas Vallis,william.g@example.com,XXX-416-6645
+1002,2,Liam,Davis,1,135-1 Hermus Vallis,liam.d@example.com,XXX-526-3448
+1003,2,Harper,Davis,1,249-7 Louros Valles,harper.d@example.com,XXX-941-9649
+1004,2,Mia,Smith,2,191-9 Ravi Vallis,mia.s@example.com,XXX-381-2595
+1005,5,Sarah,White,2,242-3 Geryon Montes,sarah.w@example.com,XXX-800-7705
+1006,5,Eleanor,Taylor,2,45-2 Verde Vallis,eleanor.t@example.com,XXX-218-4796
+1007,5,Sarah,White,2,242-3 Geryon Montes,sarah.w@example.com,XXX-800-7705
+1008,2,Ethan,Moore,1,93-11 Granicus Valles,ethan.m@example.com,XXX-060-4077
+1009,5,Charles,Hernandez,1,81-15 Chalce Montes,charles.h@example.com,XXX-061-2330
+1010,5,Henry,Smith,1,204-18 Asopus Vallis,henry.s@example.com,XXX-313-2708
+1011,5,Mason,Jones,1,225-1 Maumee Valles,mason.j@example.com,XXX-837-9065
+1012,5,Harry,Garcia,1,236-5 Euripus Mons,harry.g@example.com,XXX-667-3862
+1013,5,Levi,Brown,2,293-8 Charitum Montes,levi.b@example.com,XXX-668-3943

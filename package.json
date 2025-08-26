@@ -1,0 +1,23 @@
+{
+  "name": "restodb",
+  "version": "1.0.0",
+  "description": "sample database",
+  "homepage": "https://github.com/archprac/restodb#readme",
+  "bugs": {
+    "url": "https://github.com/archprac/restodb/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/archprac/restodb.git"
+  },
+  "license": "MIT",
+  "author": "archprac",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "build": "node ./tools/csv2sql.js ./csv/*.csv > ./mysql-restodb-insert.sql"
+  },
+  "devDependencies": {
+    "csv-parse": "^6.1.0"
+  }
+}
