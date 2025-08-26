@@ -1,7 +1,0 @@
-exclude:
-- .git/
-- package.json
-- package-lock.json
-- README.md
-- README-ja.md
-
