@@ -1,0 +1,9 @@
+id,gate_name,gate_type_cd
+1,Store Entrance,2
+2,Store Exit,5
+3,Floor Entrance,2
+4,Floor Exit,5
+5,Staff Entrance,1
+6,Staff Exit,5
+7,Delivery Entrance,1
+8,Delivery Exit,4

@@ -10,8 +10,8 @@ sample database
 $ git clone https://github.com/archprac/restodb.git
 $ cd restodb/
 $
-$ mysql -u ${USER} -p < ./mysql-restodb-create.sql
-$ mysql -u ${USER} -p < ./mysql-restodb-insert.sql
+$ mysql -u ${USER} -p < ./restodb-create-mysql.sql
+$ mysql -u ${USER} -p < ./restodb-insert.sql
 $
 $ mysql -u ${USER} -p -e 'SHOW TABLES' restodb
 +-------------------------+

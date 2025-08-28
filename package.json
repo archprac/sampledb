@@ -13,9 +13,10 @@
   "license": "MIT",
   "author": "archprac",
   "type": "module",
-  "main": "index.js",
   "scripts": {
-    "build": "node ./tools/csv2sql.js ./data/csv/*.csv > ./mysql-restodb-insert.sql"
+    "my2ora": "node tools/my2ora.js restodb-create-mysql.sql > restodb-create-oracle.sql",
+    "csv2ins": "node ./tools/csv2sql.js ./data/*.csv > ./restodb-insert.sql",
+    "build": "npm run my2ora && npm run csv2ins"
   },
   "devDependencies": {
     "csv-parse": "^6.1.0"

@@ -1,10 +1,4 @@
-
--- DROP DATABASE IF EXISTS restodb;
-
 CREATE DATABASE IF NOT EXISTS restodb;
-
--- CREATE USER IF NOT EXISTS 'testuser'@'%' IDENTIFIED BY 'testuser';
--- CREATE USER IF NOT EXISTS 'app'@'localhost' IDENTIFIED BY '********';
 
 DROP VIEW IF EXISTS restodb.daily_menu_order_report;
 DROP TRIGGER IF EXISTS restodb.customers_trig_upd;
@@ -29,28 +23,29 @@ DROP TABLE IF EXISTS restodb.gates;
 DROP TABLE IF EXISTS restodb.calendar;
 
 CREATE TABLE restodb.calendar (
-    calendar_date DATE PRIMARY KEY,
-    calendar_type_cd INT,
+    calendar_date DATE NOT NULL,
+    calendar_type_cd INT NOT NULL,
     open_time TIME,
     close_time TIME,
-    calendar_comment VARCHAR(1000)
+    calendar_comment VARCHAR(1000),
+    CONSTRAINT pk_calendar PRIMARY KEY(calendar_date)
 );
 
 CREATE TABLE restodb.products (
-    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    id INT AUTO_INCREMENT NOT NULL,
     product_name VARCHAR(255) NOT NULL,
     provide_cd INT NOT NULL,
     product_overview VARCHAR(4000),
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
     deleted_at DATETIME(2),
-    UNIQUE(product_name, deleted_at)
+    CONSTRAINT pk_products PRIMARY KEY(id)
 ) AUTO_INCREMENT = 1000;
 
-CREATE INDEX products_idx1 ON restodb.products (product_name);
+CREATE INDEX idx_products_01 ON restodb.products (product_name);
 
 CREATE TABLE restodb.menus (
-    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    id INT AUTO_INCREMENT NOT NULL,
     menu_name VARCHAR(255) NOT NULL,
     menu_type_cd INT,
     provide_cd INT NOT NULL,
@@ -60,28 +55,31 @@ CREATE TABLE restodb.menus (
     menu_overview VARCHAR(4000),
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
-    deleted_at DATETIME(2)
+    deleted_at DATETIME(2),
+    CONSTRAINT pk_menus PRIMARY KEY(id)
 ) AUTO_INCREMENT = 1000;
 
 CREATE TABLE restodb.menu_products (
-    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    id INT AUTO_INCREMENT NOT NULL,
     menu_id INT NOT NULL,
     product_id INT NOT NULL,
     display_order INT NOT NULL,
-    FOREIGN KEY (menu_id) REFERENCES restodb.menus(id),
-    FOREIGN KEY (product_id) REFERENCES restodb.products(id)
+    CONSTRAINT pk_menu_products PRIMARY KEY(id),
+    CONSTRAINT fk_menu_products_01 FOREIGN KEY (menu_id) REFERENCES restodb.menus(id),
+    CONSTRAINT fk_menu_products_02 FOREIGN KEY (product_id) REFERENCES restodb.products(id)
 ) AUTO_INCREMENT = 1000;
 
 CREATE TABLE restodb.seats (
-    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    id INT AUTO_INCREMENT NOT NULL,
     seet_name VARCHAR(1000) NOT NULL,
     seat_type_cd INT NOT NULL,
     seet_count INT NOT NULL,
-    seat_comment VARCHAR(4000)
+    seat_comment VARCHAR(4000),
+    CONSTRAINT pk_seats PRIMARY KEY(id)
 ) AUTO_INCREMENT = 1000;
 
 CREATE TABLE restodb.customers (
-    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    id INT AUTO_INCREMENT NOT NULL,
     customer_status_cd INT,
     customer_first_name VARCHAR(255),
     customer_last_name VARCHAR(255),
@@ -93,14 +91,13 @@ CREATE TABLE restodb.customers (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
     deleted_at DATETIME(2),
-    UNIQUE(customer_email_address, deleted_at),
-    UNIQUE(customer_phone_number, deleted_at),
-    FOREIGN KEY (integrated_customer_id) REFERENCES restodb.customers(id)
+    CONSTRAINT pk_customers PRIMARY KEY(id),
+    CONSTRAINT fk_customers_01 FOREIGN KEY (integrated_customer_id) REFERENCES restodb.customers(id)
 ) AUTO_INCREMENT = 1000;
 
-CREATE INDEX customers_idx1 ON restodb.customers (customer_first_name, customer_last_name);
+CREATE INDEX idx_customers_01 ON restodb.customers (customer_first_name, customer_last_name);
 
-DELIMITER //
+DELIMITER /
 CREATE TRIGGER restodb.customers_trig_upd
 AFTER UPDATE ON restodb.customers 
 FOR EACH ROW
@@ -110,46 +107,50 @@ BEGIN
     THEN
         UPDATE restodb.customers c 
         SET c.integrated_customer_id = NEW.integrated_customer_id
-        WHERE c.integrated_customer_id = id;
+        WHERE c.integrated_customer_id = OLD.id;
     END IF;
-END//
+END;
+/
 DELIMITER ;
 
 CREATE TABLE restodb.orderers (
-    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    id INT AUTO_INCREMENT NOT NULL,
     notice VARCHAR(4000),
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
-    deleted_at DATETIME(2)
+    deleted_at DATETIME(2),
+    CONSTRAINT pk_orderers PRIMARY KEY(id)
 ) AUTO_INCREMENT = 1000;
 
 CREATE TABLE restodb.orderer_customers (
-    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    id INT AUTO_INCREMENT NOT NULL,
     orderer_id INT NOT NULL,
     customer_id INT NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
     deleted_at DATETIME(2),
-    FOREIGN KEY (orderer_id) REFERENCES restodb.orderers(id),
-    FOREIGN KEY (customer_id) REFERENCES restodb.customers(id)
+    CONSTRAINT pk_orderer_customers PRIMARY KEY(id),
+    CONSTRAINT fk_orderer_customers_01 FOREIGN KEY (orderer_id) REFERENCES restodb.orderers(id),
+    CONSTRAINT fk_orderer_customers_02 FOREIGN KEY (customer_id) REFERENCES restodb.customers(id)
 ) AUTO_INCREMENT = 1000;
 
 CREATE TABLE restodb.orderer_reserves (
-    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    id INT AUTO_INCREMENT NOT NULL,
     orderer_id INT NOT NULL,
     seat_id INT,
     reserve_status_cd INT,
     reserve_start_time DATETIME,
     reserve_end_time DATETIME,
     number_of_people INT,
-    FOREIGN KEY (orderer_id) REFERENCES restodb.orderers(id),
-    FOREIGN KEY (seat_id) REFERENCES restodb.seats(id)
+    CONSTRAINT pk_orderer_reserves PRIMARY KEY(id),
+    CONSTRAINT fk_orderer_reserves_01 FOREIGN KEY (orderer_id) REFERENCES restodb.orderers(id),
+    CONSTRAINT fk_orderer_reserves_02 FOREIGN KEY (seat_id) REFERENCES restodb.seats(id)
 ) AUTO_INCREMENT = 1000;
 
-CREATE INDEX orderer_reserves_idx1 ON restodb.orderer_reserves (orderer_id, seat_id);
+CREATE INDEX idx_orderer_reserves_01 ON restodb.orderer_reserves (orderer_id, seat_id);
 
 CREATE TABLE restodb.orderer_visits (
-    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    id INT AUTO_INCREMENT NOT NULL,
     orderer_id INT NOT NULL,
     seat_id INT,
     check_in DATETIME,
@@ -159,14 +160,15 @@ CREATE TABLE restodb.orderer_visits (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
     deleted_at DATETIME(2),
-    FOREIGN KEY (orderer_id) REFERENCES restodb.orderers(id),
-    FOREIGN KEY (seat_id) REFERENCES restodb.seats(id)
+    CONSTRAINT pk_orderer_visits PRIMARY KEY(id),
+    CONSTRAINT fk_orderer_visits_01 FOREIGN KEY (orderer_id) REFERENCES restodb.orderers(id),
+    CONSTRAINT fk_orderer_visits_02 FOREIGN KEY (seat_id) REFERENCES restodb.seats(id)
 ) AUTO_INCREMENT = 1000;
 
-CREATE INDEX orderer_visits_idx1 ON restodb.orderer_visits (orderer_id, seat_id);
+CREATE INDEX idx_orderer_visits_01 ON restodb.orderer_visits (orderer_id, seat_id);
 
 CREATE TABLE restodb.staffs (
-    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    id INT AUTO_INCREMENT NOT NULL,
     contract_type_cd INT NOT NULL,
     staff_first_name VARCHAR(255) NOT NULL,
     staff_last_name VARCHAR(255) NOT NULL,
@@ -179,25 +181,24 @@ CREATE TABLE restodb.staffs (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
     deleted_at DATETIME(2),
-    UNIQUE(staff_email_address, deleted_at),
-    UNIQUE(staff_phone_number, deleted_at)
+    CONSTRAINT pk_staffs PRIMARY KEY(id)
 ) AUTO_INCREMENT = 1000;
 
-CREATE INDEX staffs_idx1 ON restodb.staffs (staff_last_name, staff_first_name);
+CREATE INDEX idx_staffs_01 ON restodb.staffs (staff_last_name, staff_first_name);
 
 CREATE TABLE restodb.rolls (
-    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    id INT AUTO_INCREMENT NOT NULL,
     roll_name VARCHAR(255) NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
     deleted_at DATETIME(2),
-    UNIQUE(roll_name, deleted_at)
+    CONSTRAINT pk_rolls PRIMARY KEY(id)
 ) AUTO_INCREMENT = 1000;
 
-CREATE INDEX rolls_idx1 ON restodb.rolls (roll_name);
+CREATE INDEX idx_rolls_01 ON restodb.rolls (roll_name);
 
 CREATE TABLE restodb.staff_rolls (
-    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    id INT AUTO_INCREMENT NOT NULL,
     staff_id INT NOT NULL,
     roll_id INT NOT NULL,
     effective_date DATETIME,
@@ -205,15 +206,15 @@ CREATE TABLE restodb.staff_rolls (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
     deleted_at DATETIME(2),
-    FOREIGN KEY (staff_id) REFERENCES restodb.staffs(id),
-    FOREIGN KEY (roll_id) REFERENCES restodb.rolls(id),
-    UNIQUE(staff_id, roll_id, deleted_at)
+    CONSTRAINT pk_staff_rolls PRIMARY KEY(id),
+    CONSTRAINT fk_staff_rolls_01 FOREIGN KEY (staff_id) REFERENCES restodb.staffs(id),
+    CONSTRAINT fk_staff_rolls_02 FOREIGN KEY (roll_id) REFERENCES restodb.rolls(id)
 ) AUTO_INCREMENT = 1000;
 
-CREATE INDEX staff_rolls_idx1 ON restodb.staff_rolls (staff_id, roll_id);
+CREATE INDEX idx_staff_rolls_01 ON restodb.staff_rolls (staff_id, roll_id);
 
 CREATE TABLE restodb.orders (
-    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    id INT AUTO_INCREMENT NOT NULL,
     orderer_id INT,
     order_datetime DATETIME NOT NULL,
     order_type_cd INT NOT NULL, 
@@ -226,21 +227,23 @@ CREATE TABLE restodb.orders (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
     deleted_at DATETIME(2),
-    FOREIGN KEY (orderer_id) REFERENCES restodb.orderers(id),
-    FOREIGN KEY (accepted_staff_id) REFERENCES restodb.staffs(id),
-    FOREIGN KEY (cleared_staff_id) REFERENCES restodb.staffs(id)
+    CONSTRAINT pk_orders PRIMARY KEY(id),
+    CONSTRAINT fk_orders_01 FOREIGN KEY (orderer_id) REFERENCES restodb.orderers(id),
+    CONSTRAINT fk_orders_02 FOREIGN KEY (accepted_staff_id) REFERENCES restodb.staffs(id),
+    CONSTRAINT fk_orders_03 FOREIGN KEY (cleared_staff_id) REFERENCES restodb.staffs(id)
 ) AUTO_INCREMENT = 1000;
 
 CREATE TABLE restodb.order_deliveres (
-    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    id INT AUTO_INCREMENT NOT NULL,
     order_id INT NOT NULL,
     delivery_staff_id INT NOT NULL, 
-    FOREIGN KEY (order_id) REFERENCES restodb.orders(id),
-    FOREIGN KEY (delivery_staff_id) REFERENCES restodb.staffs(id)
+    CONSTRAINT pk_order_deliveres PRIMARY KEY(id),
+    CONSTRAINT fk_order_deliveres_01 FOREIGN KEY (order_id) REFERENCES restodb.orders(id),
+    CONSTRAINT fk_order_deliveres_02 FOREIGN KEY (delivery_staff_id) REFERENCES restodb.staffs(id)
 ) AUTO_INCREMENT = 1000;
 
 CREATE TABLE restodb.order_menus (
-    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    id INT AUTO_INCREMENT NOT NULL,
     order_id INT NOT NULL,
     menu_id INT NOT NULL,
     order_count INT NOT NULL,
@@ -248,12 +251,13 @@ CREATE TABLE restodb.order_menus (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
     deleted_at DATETIME(2),
-    FOREIGN KEY (order_id) REFERENCES restodb.orders(id),
-    FOREIGN KEY (menu_id) REFERENCES restodb.menus(id)
+    CONSTRAINT pk_order_menus PRIMARY KEY(id),
+    CONSTRAINT fk_order_menus_01 FOREIGN KEY (order_id) REFERENCES restodb.orders(id),
+    CONSTRAINT fk_order_menus_02 FOREIGN KEY (menu_id) REFERENCES restodb.menus(id)
 ) AUTO_INCREMENT = 1000;
 
 CREATE TABLE restodb.shifts (
-    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    id INT AUTO_INCREMENT NOT NULL,
     staff_id INT,
     shift_start_datetime DATETIME,
     shift_end_datetime DATETIME,
@@ -262,20 +266,22 @@ CREATE TABLE restodb.shifts (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
     deleted_at DATETIME(2),
-    FOREIGN KEY (staff_id) REFERENCES restodb.staffs(id)
+    CONSTRAINT pk_shifts PRIMARY KEY(id),
+    CONSTRAINT fk_shifts_01 FOREIGN KEY (staff_id) REFERENCES restodb.staffs(id)
 ) AUTO_INCREMENT = 1000;
 
 CREATE TABLE restodb.gates (
-    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    id INT AUTO_INCREMENT NOT NULL,
     gate_name VARCHAR(500) NOT NULL,
     gate_type_cd INT NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
-    deleted_at DATETIME(2)
+    deleted_at DATETIME(2),
+    CONSTRAINT pk_gates PRIMARY KEY(id)
 ) AUTO_INCREMENT = 1000;
 
 CREATE TABLE restodb.staff_accesses (
-    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    id INT AUTO_INCREMENT NOT NULL,
     staff_id INT NOT NULL,
     gate_id INT NOT NULL,
     access_type_cd INT NOT NULL,
@@ -283,8 +289,9 @@ CREATE TABLE restodb.staff_accesses (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
     deleted_at DATETIME(2),
-    FOREIGN KEY (staff_id) REFERENCES restodb.staffs(id),
-    FOREIGN KEY (gate_id) REFERENCES restodb.gates(id)
+    CONSTRAINT pk_staff_accesses PRIMARY KEY(id),
+    CONSTRAINT fk_staff_accesses_01 FOREIGN KEY (staff_id) REFERENCES restodb.staffs(id),
+    CONSTRAINT fk_staff_accesses_02 FOREIGN KEY (gate_id) REFERENCES restodb.gates(id)
 ) AUTO_INCREMENT = 1000;
 
 CREATE VIEW restodb.daily_menu_order_report AS
@@ -292,8 +299,8 @@ SELECT
     c.calendar_date,
     m.menu_name,
     COUNT(*) AS order_count,
-    SUM(o.amount) total_amount,
-    SUM(o.discount) total_discount
+    SUM(o.amount) AS total_amount,
+    SUM(o.discount) AS total_discount
 FROM restodb.calendar c
     JOIN restodb.orders o ON CAST(o.order_datetime AS DATE) = c.calendar_date
     JOIN restodb.order_menus om ON om.order_id = o.id

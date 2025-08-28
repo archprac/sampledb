@@ -20,7 +20,7 @@ for (let filepath of positionals) {
     if (0 < records.length) {
         let head = records.shift();
         if (0 < records.length) {
-            console.info(util.format("DELETE FROM restodb.%s;", path.parse(filepath).name));
+            console.info(util.format("DELETE FROM restodb.%s WHERE id < 1000;", path.parse(filepath).name));
             console.info();
             console.info(util.format("INSERT INTO restodb.%s", path.parse(filepath).name));
             console.info(util.format("  (%s)", head.join(",")));

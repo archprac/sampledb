@@ -1,0 +1,11 @@
+id,seet_name,seat_type_cd,seet_count,seat_comment
+1,counter,1,12,
+2,table-A,2,4,
+3,table-B,2,4,
+4,table-C,2,4,
+5,table-D,2,4,
+6,table-E,2,4,terrace
+7,table-F,2,4,terrace
+8,booth-A,3,4,
+9,booth-B,3,4,
+10,booth-C,3,4,
