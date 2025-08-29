@@ -14,7 +14,7 @@
   "author": "archprac",
   "type": "module",
   "scripts": {
-    "my2ora": "node tools/my2ora.js restodb-create-mysql.sql > restodb-create-oracle.sql",
+    "my2ora": "node tools/my2ora.js restodb-create-mysql8.sql > restodb-create-oracle23.sql",
     "csv2ins": "node ./tools/csv2sql.js ./data/*.csv > ./restodb-insert.sql",
     "build": "npm run my2ora && npm run csv2ins"
   },

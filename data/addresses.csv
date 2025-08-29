@@ -1,4 +1,4 @@
-id,customer_first_name,customer_last_name,gender_cd,customer_address,customer_email_address,customer_phone_number
+id,first_name,last_name,gender_cd,address,email_address,phone_number
 1,Abigail,Hernandez,2,82-5 Una Vallis,abigail.h@example.com,XXX-974-5439
 2,Alexander,Anderson,1,287-3 Durius Valles,alexander.a@example.com,XXX-400-5392
 3,Amanda,Johnson,2,282-4 Utopia Planitia,amanda.j@example.com,XXX-272-1262
