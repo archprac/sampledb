@@ -56,7 +56,8 @@ CREATE TABLE restodb.menus (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
     deleted_at DATETIME(2),
-    CONSTRAINT pk_menus PRIMARY KEY(id)
+    CONSTRAINT pk_menus PRIMARY KEY(id),
+    CONSTRAINT ck_menus_01 CHECK (order_start_time < order_stop_time)
 ) AUTO_INCREMENT = 1000;
 
 CREATE TABLE restodb.menu_products (
@@ -144,7 +145,8 @@ CREATE TABLE restodb.orderer_reserves (
     number_of_people INT,
     CONSTRAINT pk_orderer_reserves PRIMARY KEY(id),
     CONSTRAINT fk_orderer_reserves_01 FOREIGN KEY (orderer_id) REFERENCES restodb.orderers(id),
-    CONSTRAINT fk_orderer_reserves_02 FOREIGN KEY (seat_id) REFERENCES restodb.seats(id)
+    CONSTRAINT fk_orderer_reserves_02 FOREIGN KEY (seat_id) REFERENCES restodb.seats(id),
+    CONSTRAINT ck_orderer_reserves_01 CHECK (reserve_start_time < reserve_end_time)
 ) AUTO_INCREMENT = 1000;
 
 CREATE INDEX idx_orderer_reserves_01 ON restodb.orderer_reserves (orderer_id, seat_id);
@@ -162,7 +164,8 @@ CREATE TABLE restodb.orderer_visits (
     deleted_at DATETIME(2),
     CONSTRAINT pk_orderer_visits PRIMARY KEY(id),
     CONSTRAINT fk_orderer_visits_01 FOREIGN KEY (orderer_id) REFERENCES restodb.orderers(id),
-    CONSTRAINT fk_orderer_visits_02 FOREIGN KEY (seat_id) REFERENCES restodb.seats(id)
+    CONSTRAINT fk_orderer_visits_02 FOREIGN KEY (seat_id) REFERENCES restodb.seats(id),
+    CONSTRAINT ck_orderer_visits_01 CHECK (check_in < check_out)
 ) AUTO_INCREMENT = 1000;
 
 CREATE INDEX idx_orderer_visits_01 ON restodb.orderer_visits (orderer_id, seat_id);
@@ -267,7 +270,8 @@ CREATE TABLE restodb.shifts (
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
     deleted_at DATETIME(2),
     CONSTRAINT pk_shifts PRIMARY KEY(id),
-    CONSTRAINT fk_shifts_01 FOREIGN KEY (staff_id) REFERENCES restodb.staffs(id)
+    CONSTRAINT fk_shifts_01 FOREIGN KEY (staff_id) REFERENCES restodb.staffs(id),
+    CONSTRAINT ck_shifts_01 CHECK (shift_start_datetime < shift_end_datetime)
 ) AUTO_INCREMENT = 1000;
 
 CREATE TABLE restodb.gates (
